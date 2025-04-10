@@ -17,15 +17,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <head>
-        <script
-          type="text/javascript"
-          src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY}&libraries=services`}
-          async={false}
-        />
-      </head>
       <body className={inter.className}>
         {children}
+        <Script
+          src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY}&libraries=services&autoload=false`}
+          strategy="beforeInteractive"
+        />
       </body>
     </html>
   );
