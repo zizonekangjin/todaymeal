@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: '오뭐먹?',
-  description: '한밭대 주변 맛집 추천',
+  description: '한밭대 근처 맛집 추천',
 };
 
 export default function RootLayout({
@@ -17,14 +17,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ko">
-      <body className={inter.className}>
-        <div className="min-h-screen bg-white">
-          <main className="container mx-auto px-4 py-8">{children}</main>
-        </div>
-        <Script
-          src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY}&libraries=services&autoload=false`}
-          strategy="beforeInteractive"
+      <head>
+        <script
+          type="text/javascript"
+          src={`//dapi.kakao.com/v2/maps/sdk.js?appkey=${process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY}&libraries=services`}
+          async={false}
         />
+      </head>
+      <body className={inter.className}>
+        {children}
       </body>
     </html>
   );
