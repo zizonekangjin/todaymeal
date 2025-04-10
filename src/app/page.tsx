@@ -92,31 +92,6 @@ export default function Home() {
   const [currentInfoWindow, setCurrentInfoWindow] = useState<any>(null);
   const [isMapLoading, setIsMapLoading] = useState(true);
 
-  useEffect(() => {
-    const initializeMap = () => {
-      if (!mapRef.current) return;
-
-      const options = {
-        center: new window.kakao.maps.LatLng(HANBAT_LOCATION.lat, HANBAT_LOCATION.lng),
-        level: 3,
-      };
-
-      const mapInstance = new window.kakao.maps.Map(mapRef.current, options);
-      setMap(mapInstance);
-
-      const center = new window.kakao.maps.LatLng(HANBAT_LOCATION.lat, HANBAT_LOCATION.lng);
-      // 초기 식당 검색
-      searchNearbyRestaurants(mapInstance);
-    };
-
-    // Kakao Maps 로드 확인 및 초기화
-    if (window.kakao && window.kakao.maps) {
-      window.kakao.maps.load(() => {
-        initializeMap();
-      });
-    }
-  }, []);
-
   const searchNearbyRestaurants = (mapInstance: any) => {
     if (!mapInstance || !window.kakao?.maps?.services) return;
 
@@ -140,6 +115,15 @@ export default function Home() {
     let totalSearches = restaurantKeywords.length + cafeKeywords.length;
     let completedSearches = 0;
 
+    const handleSearchComplete = () => {
+      completedSearches++;
+      if (completedSearches === totalSearches) {
+        const allPlaces = Array.from(uniquePlaces.values());
+        setRestaurants(allPlaces);
+        setIsMapLoading(false); // 검색이 완료되면 로딩 상태 해제
+      }
+    };
+
     // 음식점 검색
     restaurantKeywords.forEach(keyword => {
       places.keywordSearch(
@@ -147,7 +131,6 @@ export default function Home() {
         (result: any[], status: string) => {
           if (status === window.kakao.maps.services.Status.OK) {
             result.forEach(place => {
-              // 카페/커피숍 카테고리는 제외
               if (!place.category_name.includes('카페') && 
                   !place.category_name.includes('커피') && 
                   !uniquePlaces.has(place.id)) {
@@ -176,7 +159,6 @@ export default function Home() {
         (result: any[], status: string) => {
           if (status === window.kakao.maps.services.Status.OK) {
             result.forEach(place => {
-              // 카페/커피숍 카테고리만 포함
               if ((place.category_name.includes('카페') || 
                    place.category_name.includes('커피')) && 
                   !uniquePlaces.has(place.id)) {
@@ -185,7 +167,7 @@ export default function Home() {
                   address: place.address_name,
                   lat: parseFloat(place.y),
                   lng: parseFloat(place.x),
-                  types: [MealType.CAFE], // 카페는 CAFE 타입만 가짐
+                  types: [MealType.CAFE],
                   openingHours: place.opening_hours,
                   category: 'cafe'
                 });
@@ -197,16 +179,45 @@ export default function Home() {
         searchOptions
       );
     });
-
-    function handleSearchComplete() {
-      completedSearches++;
-      if (completedSearches === totalSearches) {
-        const allPlaces = Array.from(uniquePlaces.values());
-        setRestaurants(allPlaces);
-        console.log(`총 ${allPlaces.length}개의 장소를 찾았습니다. (음식점: ${allPlaces.filter(p => p.category === 'restaurant').length}개, 카페: ${allPlaces.filter(p => p.category === 'cafe').length}개)`);
-      }
-    }
   };
+
+  useEffect(() => {
+    const initializeMap = () => {
+      if (!mapRef.current) return;
+
+      const options = {
+        center: new window.kakao.maps.LatLng(HANBAT_LOCATION.lat, HANBAT_LOCATION.lng),
+        level: 3,
+      };
+
+      const mapInstance = new window.kakao.maps.Map(mapRef.current, options);
+      setMap(mapInstance);
+
+      const center = new window.kakao.maps.LatLng(HANBAT_LOCATION.lat, HANBAT_LOCATION.lng);
+
+      // 1km 반경 원 그리기
+      const circle = new window.kakao.maps.Circle({
+        center,
+        radius: SEARCH_RADIUS,
+        strokeWeight: 2,
+        strokeColor: '#75B8FA',
+        strokeOpacity: 0.8,
+        fillColor: '#CFE7FF',
+        fillOpacity: 0.3
+      });
+      circle.setMap(mapInstance);
+
+      // 초기 식당 검색
+      searchNearbyRestaurants(mapInstance);
+    };
+
+    // Kakao Maps 로드 확인 및 초기화
+    if (window.kakao && window.kakao.maps) {
+      window.kakao.maps.load(() => {
+        initializeMap();
+      });
+    }
+  }, []);
 
   const handleMealClick = (mealType: MealType) => {
     if (!map || restaurants.length === 0) return;
