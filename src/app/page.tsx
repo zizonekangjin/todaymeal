@@ -94,73 +94,40 @@ export default function Home() {
 
   useEffect(() => {
     const initializeMap = () => {
-      if (!mapRef.current || !window.kakao?.maps) {
-        console.log('Map container or Kakao maps not ready');
-        return;
-      }
+      if (!mapRef.current) return;
 
-      try {
-        const center = new window.kakao.maps.LatLng(HANBAT_LOCATION.lat, HANBAT_LOCATION.lng);
-        const options = {
-          center,
-          level: 3
-        };
-
-        const mapInstance = new window.kakao.maps.Map(mapRef.current, options);
-        setMap(mapInstance);
-
-        // 1km 반경 원 그리기
-        /*if (window.kakao.maps.Circle) {
-          const circle = new window.kakao.maps.Circle({
-            center,
-            radius: SEARCH_RADIUS,
-            strokeWeight: 2,
-            strokeColor: '#75B8FA',
-            strokeOpacity: 0.8,
-            fillColor: '#CFE7FF',
-            fillOpacity: 0.3
-          });
-          circle.setMap(mapInstance);
-        }*/
-
-        // 초기 식당 검색
-        searchNearbyRestaurants(mapInstance);
-        setIsMapLoading(false);
-      } catch (error) {
-        console.error('Failed to initialize map:', error);
-        setIsMapLoading(false);
-      }
-    };
-
-    // 지도 초기화 시도
-    if (window.kakao?.maps) {
-      initializeMap();
-    } else {
-      const checkKakaoMaps = setInterval(() => {
-        if (window.kakao?.maps) {
-          initializeMap();
-          clearInterval(checkKakaoMaps);
-        }
-      }, 100);
-
-      // 10초 후에도 로드되지 않으면 인터벌 제거
-      setTimeout(() => {
-        clearInterval(checkKakaoMaps);
-        if (!map) {
-          console.error('Failed to load Kakao maps');
-          setIsMapLoading(false);
-        }
-      }, 10000);
-
-      return () => {
-        clearInterval(checkKakaoMaps);
+      const options = {
+        center: new window.kakao.maps.LatLng(HANBAT_LOCATION.lat, HANBAT_LOCATION.lng),
+        level: 3,
       };
-    }
 
-    return () => {
-      if (currentMarker) currentMarker.setMap(null);
-      if (currentInfoWindow) currentInfoWindow.close();
+      const mapInstance = new window.kakao.maps.Map(mapRef.current, options);
+      setMap(mapInstance);
+
+      const center = new window.kakao.maps.LatLng(HANBAT_LOCATION.lat, HANBAT_LOCATION.lng);
+
+      // 1km 반경 원 그리기
+      const circle = new window.kakao.maps.Circle({
+        center,
+        radius: SEARCH_RADIUS,
+        strokeWeight: 2,
+        strokeColor: '#75B8FA',
+        strokeOpacity: 0.8,
+        fillColor: '#CFE7FF',
+        fillOpacity: 0.3
+      });
+      circle.setMap(mapInstance);
+
+      // 초기 식당 검색
+      searchNearbyRestaurants(mapInstance);
     };
+
+    // Kakao Maps 로드 확인 및 초기화
+    if (window.kakao && window.kakao.maps) {
+      window.kakao.maps.load(() => {
+        initializeMap();
+      });
+    }
   }, []);
 
   const searchNearbyRestaurants = (mapInstance: any) => {
