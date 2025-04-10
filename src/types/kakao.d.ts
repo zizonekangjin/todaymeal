@@ -9,6 +9,8 @@ interface KakaoMapServices {
           x: string;
           y: string;
           opening_hours?: string;
+          category_name: string;
+          id: string;
         }>,
         status: string
       ) => void,
@@ -47,31 +49,10 @@ interface KakaoMaps {
   services: KakaoMapServices;
 }
 
-interface KakaoStatic {
-  maps: KakaoMaps;
-}
-
 declare global {
   interface Window {
     kakao: {
-      maps: {
-        load: (callback: () => void) => void;
-        LatLng: new (lat: number, lng: number) => any;
-        Map: new (container: HTMLElement, options: any) => any;
-        Marker: new (options: any) => any;
-        InfoWindow: new (options: any) => any;
-        services: {
-          Places: new () => any;
-          Status: {
-            OK: string;
-            ZERO_RESULT: string;
-            ERROR: string;
-          };
-          SortBy: {
-            DISTANCE: number;
-          };
-        };
-      };
+      maps: KakaoMaps;
     };
   }
 }
