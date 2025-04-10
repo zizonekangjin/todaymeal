@@ -110,7 +110,7 @@ export default function Home() {
         setMap(mapInstance);
 
         // 1km 반경 원 그리기
-        if (window.kakao.maps.Circle) {
+        /*if (window.kakao.maps.Circle) {
           const circle = new window.kakao.maps.Circle({
             center,
             radius: SEARCH_RADIUS,
@@ -121,7 +121,7 @@ export default function Home() {
             fillOpacity: 0.3
           });
           circle.setMap(mapInstance);
-        }
+        }*/
 
         // 초기 식당 검색
         searchNearbyRestaurants(mapInstance);
