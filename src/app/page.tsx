@@ -110,16 +110,18 @@ export default function Home() {
         setMap(mapInstance);
 
         // 1km 반경 원 그리기
-        const circle = new window.kakao.maps.Circle({
-          center,
-          radius: SEARCH_RADIUS,
-          strokeWeight: 2,
-          strokeColor: '#75B8FA',
-          strokeOpacity: 0.8,
-          fillColor: '#CFE7FF',
-          fillOpacity: 0.3
-        });
-        circle.setMap(mapInstance);
+        if (window.kakao.maps.Circle) {
+          const circle = new window.kakao.maps.Circle({
+            center,
+            radius: SEARCH_RADIUS,
+            strokeWeight: 2,
+            strokeColor: '#75B8FA',
+            strokeOpacity: 0.8,
+            fillColor: '#CFE7FF',
+            fillOpacity: 0.3
+          });
+          circle.setMap(mapInstance);
+        }
 
         // 초기 식당 검색
         searchNearbyRestaurants(mapInstance);
