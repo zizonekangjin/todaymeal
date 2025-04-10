@@ -105,19 +105,6 @@ export default function Home() {
       setMap(mapInstance);
 
       const center = new window.kakao.maps.LatLng(HANBAT_LOCATION.lat, HANBAT_LOCATION.lng);
-
-      // 1km 반경 원 그리기
-      const circle = new window.kakao.maps.Circle({
-        center,
-        radius: SEARCH_RADIUS,
-        strokeWeight: 2,
-        strokeColor: '#75B8FA',
-        strokeOpacity: 0.8,
-        fillColor: '#CFE7FF',
-        fillOpacity: 0.3
-      });
-      circle.setMap(mapInstance);
-
       // 초기 식당 검색
       searchNearbyRestaurants(mapInstance);
     };
